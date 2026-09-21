@@ -1,0 +1,4 @@
+models/
+transcripts/
+*.16k.wav
+__pycache__/
