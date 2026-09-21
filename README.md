@@ -5,23 +5,38 @@ speech with Silero VAD, transcribes with Whisper via
 [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx). No API keys, no network
 access at transcription time.
 
-## Setup
+## Quick start
 
 ```bash
-pip install -r requirements.txt
-./tools/fetch_models.sh small      # or: medium, turbo, tiny.en, small.en ...
+git clone https://github.com/DavidFreibrun/Ruchel.git
+cd Ruchel
+pip3 install -r requirements.txt
+./tools/fetch_models.sh small          # ~1.3 GB, from GitHub release assets
+
+python3 tools/transcribe.py "Museu of Make Believe.MOV"
 ```
 
-`fetch_models.sh` pulls the Whisper and VAD models from sherpa-onnx's GitHub
-release assets into `models/`.
+That writes `transcripts/Museu of Make Believe.{txt,srt,json}`. Nothing leaves
+your machine and no API key is involved — ffmpeg ships inside the
+`imageio-ffmpeg` wheel, so there is nothing else to install.
 
-## Use
+Progress prints as it goes, one line per speech segment, so you can read the
+transcript forming and stop early if the language or model choice looks wrong.
 
-```bash
-python3 tools/transcribe.py "Museu of Make Believe.MOV" --out-dir transcripts/
-```
+## Options
 
-Writes three files per input, named after the source:
+| Flag | Effect |
+| --- | --- |
+| `--model medium` / `--model turbo` | more accurate, slower; `turbo` (large-v3-turbo) is the best quality that still runs sanely on CPU. Fetch it first: `./tools/fetch_models.sh turbo` |
+| `--language pt` | force a language (ISO code) instead of auto-detecting |
+| `--fp32` | full-precision weights; marginally better, roughly 2x slower |
+| `--threads N` | defaults to the CPU count |
+| `--keep-wav` | keep the decoded 16 kHz wav so re-runs skip decoding |
+
+The multilingual models (`small`, `medium`, `turbo`) auto-detect language per
+segment. The `.en` variants are English-only and faster.
+
+## Output
 
 | File | Contents |
 | --- | --- |
@@ -29,20 +44,11 @@ Writes three files per input, named after the source:
 | `NAME.srt` | subtitles with timestamps |
 | `NAME.json` | segments with `start`/`end` seconds, plus source metadata |
 
-Useful flags:
-
-- `--model medium` / `--model turbo` — more accurate, slower. `turbo`
-  (large-v3-turbo) is the best quality that still runs at a sane speed on CPU.
-- `--language pt` — skip auto-detection and force a language (ISO code). The
-  multilingual models (`small`, `medium`, `turbo`) auto-detect by default; the
-  `.en` models are English-only and faster.
-- `--fp32` — full-precision weights instead of int8. Marginally more accurate,
-  roughly 2x slower.
-- `--threads N` — defaults to the CPU count.
-
 ## Notes
 
 - Any format ffmpeg can read works — `.MOV`, `.mp4`, `.mkv`, `.m4a`, `.wav`.
+- If a model is missing the script says which one and how to fetch it, rather
+  than failing inside onnxruntime.
 - Video is never decoded; only the audio track is touched, so file size matters
   far less than duration.
 - Silence is skipped by the VAD, so runtime tracks speech time, not wall time.

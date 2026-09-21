@@ -60,6 +60,30 @@ def build_vad(models_dir: Path, max_segment: float) -> sherpa_onnx.VoiceActivity
     return sherpa_onnx.VoiceActivityDetector(cfg, buffer_size_in_seconds=120)
 
 
+def check_models(models_dir: Path, name: str, int8: bool) -> None:
+    """Fail with an actionable message rather than an onnxruntime traceback."""
+    suffix = ".int8" if int8 else ""
+    model_dir = models_dir / f"sherpa-onnx-whisper-{name}"
+    needed = [
+        models_dir / "silero_vad.onnx",
+        model_dir / f"{name}-encoder{suffix}.onnx",
+        model_dir / f"{name}-decoder{suffix}.onnx",
+        model_dir / f"{name}-tokens.txt",
+    ]
+    missing = [p for p in needed if not p.exists()]
+    if not missing:
+        return
+    print(f"error: missing model files under {models_dir}/", file=sys.stderr)
+    for p in missing:
+        print(f"  {p}", file=sys.stderr)
+    if suffix and model_dir.exists():
+        print("\nThe model is present but has no int8 weights; retry with --fp32.", file=sys.stderr)
+    else:
+        print(f"\nRun:  ./tools/fetch_models.sh {name}", file=sys.stderr)
+        print("(or point --models-dir at an existing download)", file=sys.stderr)
+    sys.exit(1)
+
+
 def build_recognizer(models_dir: Path, name: str, language: str, threads: int, int8: bool):
     model_dir = models_dir / f"sherpa-onnx-whisper-{name}"
     suffix = ".int8" if int8 else ""
@@ -108,7 +132,14 @@ def main() -> int:
     p.add_argument("--max-segment", type=float, default=25.0,
                    help="max seconds per speech chunk (whisper accepts 30)")
     p.add_argument("--fp32", action="store_true", help="use fp32 weights instead of int8")
+    p.add_argument("--keep-wav", action="store_true",
+                   help="keep the decoded 16 kHz wav (~115 MB per hour) for re-runs")
     args = p.parse_args()
+
+    check_models(args.models_dir, args.model, int8=not args.fp32)
+    if not args.input.exists():
+        print(f"error: no such file: {args.input}", file=sys.stderr)
+        return 1
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
     stem = args.input.stem
@@ -150,6 +181,8 @@ def main() -> int:
     jsn.write_text(json.dumps({"source": str(args.input), "duration_seconds": duration,
                                "model": args.model, "segments": segments},
                               ensure_ascii=False, indent=2), encoding="utf-8")
+    if not args.keep_wav:
+        wav.unlink(missing_ok=True)
     print(f"done: {txt}, {srt}, {jsn}")
     return 0
 
