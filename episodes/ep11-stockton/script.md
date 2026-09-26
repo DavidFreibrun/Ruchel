@@ -1,6 +1,6 @@
 # Heritage Pinoy Talks — Episode 11: Little Manila, Stockton
 
-Narrator: Maya. Target runtime ~18–20 min (~2,750 words, same pace as Ep 10).
+Narrator: Maya. ~2,060 words ≈ 14–15 min at Ep 10 pace (~145 wpm). Ep 10 was ~2,700 words / 18:52.
 Bracketed lines are section markers for the edit — not read aloud.
 Every factual claim is tied to a source in `fact-check.md`.
 
