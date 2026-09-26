@@ -1,0 +1,24 @@
+{
+  "episode": 11,
+  "engine": null,
+  "decided_by": null,
+  "decided_on": null,
+  "skip_sections": ["NEXT TIME"],
+  "gemini": {
+    "model": null,
+    "voice": null,
+    "style_prompt": null,
+    "language_code": "en-US",
+    "temperature": null
+  },
+  "elevenlabs": {
+    "model": "eleven_multilingual_v2",
+    "voice_id": "TcZDZdbOYm8HPLDiDkn0",
+    "stability": 0.30,
+    "similarity_boost": 0.82,
+    "style": 0.50,
+    "use_speaker_boost": true,
+    "context": "previous_text / next_text = the real neighbouring spoken lines",
+    "post_processing": "none - ship verbatim"
+  }
+}

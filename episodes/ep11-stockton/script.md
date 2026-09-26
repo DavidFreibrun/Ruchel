@@ -186,8 +186,6 @@ So go look up that freeway, and tell me what you found. What was there before th
 
 Salamat sa panonood, and I'll see you in the next one.
 
-[NEXT TIME — PICK ONE BEFORE VO]
+[NEXT TIME — TBD]
 
-Option A: Next time on Heritage Pinoy Talks, the Filipino women Spain was most afraid of. The babaylan, and what happened to the ones who refused to kneel.
-
-Option B: Next time on Heritage Pinoy Talks, why so many Filipinos have Spanish last names. Hint: in 1849, a Spanish governor handed out a book of surnames, and your family's real name might not be in it.
+Teaser not decided yet (David, 2026-09-26). Leave this out of the VO until it's written.

@@ -44,6 +44,20 @@ segment. The `.en` variants are English-only and faster.
 | `NAME.srt` | subtitles with timestamps |
 | `NAME.json` | segments with `start`/`end` seconds, plus source metadata |
 
+## Gemini TTS voiceover (Heritage Pinoy Talks)
+
+`tools/gemini_tts.py` voices an episode's `script.md` with Gemini TTS, one WAV per
+`[SECTION]`. It only runs when the episode's `vo.config.json` says
+`"engine": "gemini"`. The engine is chosen per episode; see
+`.claude/skills/hpt-voiceover/SKILL.md`.
+
+```bash
+python3 tools/gemini_tts.py episodes/ep11-stockton --list
+GEMINI_API_KEY=... python3 tools/gemini_tts.py episodes/ep11-stockton all
+```
+
+A take can be checked by transcribing it back with `tools/transcribe.py`.
+
 ## Notes
 
 - Any format ffmpeg can read works — `.MOV`, `.mp4`, `.mkv`, `.m4a`, `.wav`.
