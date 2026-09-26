@@ -5,7 +5,7 @@ David is moving Ep 11 back to a local Claude Code session on his PC, the way Ep 
 ## Where things are
 
 - HPT root: `D:\Freibrun Enterprises\Heritage Pinoy Talks`. G: is retired; never use G: paths from old scripts.
-- This repo: clone it to `D:\Freibrun Enterprises\Heritage Pinoy Talks\Ruchel`, branch `claude/quirky-wozniak-6i2155`.
+- This repo: `D:\Freibrun Enterprises\Heritage Pinoy Talks\Ruchel-repo`, branch `claude/quirky-wozniak-6i2155`. **Not** `...\Ruchel`, which is a separate, non-git folder of David's; never touch it.
 - Skill: `.claude/skills/hpt-voiceover/SKILL.md`. Read it first. Its engine gate is already answered for Ep 11.
 
 ## Done

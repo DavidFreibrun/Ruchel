@@ -9,7 +9,7 @@ description: Generate Maya's narration VO for a Heritage Pinoy Talks (HPT) episo
 >
 > - HPT root: `D:\Freibrun Enterprises\Heritage Pinoy Talks` (David, 2026-09-26)
 > - Pipeline `.env` (`ELEVENLABS_API_KEY`): `D:\Freibrun Enterprises\Heritage Pinoy Talks\heritage-pinoy-pipeline\.env`. This is assumed to keep the old layout; override it with `HPT_PIPELINE_ENV` if it moved.
-> - This repo: `D:\Freibrun Enterprises\Heritage Pinoy Talks\Ruchel`, with episodes under `Ruchel\episodes\epNN-slug\`.
+> - This repo: `D:\Freibrun Enterprises\Heritage Pinoy Talks\Ruchel-repo`. `...\Ruchel` (no suffix) is a separate folder of David's, not this repo; never touch it.
 
 ## Gate: which engine? (do this first, every episode)
 
