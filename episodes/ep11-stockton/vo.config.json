@@ -1,24 +1,27 @@
 {
   "episode": 11,
-  "engine": null,
-  "decided_by": null,
-  "decided_on": null,
+  "engine": "gemini",
+  "decided_by": "David",
+  "decided_on": "2026-09-26",
   "skip_sections": ["NEXT TIME"],
   "gemini": {
-    "model": null,
+    "model": "gemini-3.8-flash-tts",
     "voice": null,
-    "style_prompt": null,
+    "audition_voices": ["Sulafat", "Kore", "Leda", "Aoede"],
+    "style_prompt": "Read this as Maya, a warm Filipino-American woman in her early forties telling her community's history to a friend. Conversational and unhurried, curious, with quiet feeling on the heavy lines and a smile on the lighter ones. Say Filipino words the Tagalog way:",
     "language_code": "en-US",
     "temperature": null
   },
-  "elevenlabs": {
-    "model": "eleven_multilingual_v2",
+  "sts": {
+    "enabled": true,
     "voice_id": "TcZDZdbOYm8HPLDiDkn0",
-    "stability": 0.30,
-    "similarity_boost": 0.82,
-    "style": 0.50,
-    "use_speaker_boost": true,
-    "context": "previous_text / next_text = the real neighbouring spoken lines",
-    "post_processing": "none - ship verbatim"
+    "model_id": "eleven_multilingual_sts_v2",
+    "voice_settings": {"stability": 0.30, "similarity_boost": 0.82, "style": 0.50, "use_speaker_boost": true},
+    "remove_background_noise": false,
+    "output_format": "mp3_44100_192"
+  },
+  "api_keys": {
+    "gemini": "Gray Matters .env (GEMINI_API_KEY), path TBD",
+    "elevenlabs": "heritage-pinoy-pipeline/.env"
   }
 }

@@ -4,6 +4,9 @@
     python3 tools/gemini_tts.py episodes/ep11-stockton --list        show the parts, no API calls
     python3 tools/gemini_tts.py episodes/ep11-stockton s03           generate one part
     python3 tools/gemini_tts.py episodes/ep11-stockton all           generate every part
+    python3 tools/gemini_tts.py episodes/ep11-stockton --audition s01
+                                     one take of s01 per voice in gemini.audition_voices
+    python3 tools/gemini_tts.py episodes/ep11-stockton --models      list the TTS models this key can use
 
 Settings come from EPISODE/vo.config.json. The script refuses to run unless that file says
 "engine": "gemini" -- the engine is David's call per episode (see .claude/skills/hpt-voiceover).
@@ -36,7 +39,7 @@ DEFAULT_RATE = 24000
 MARKER = re.compile(r"^\[(?P<name>[^\]]+)\]\s*$")
 
 
-def load_config(ep: Path) -> dict:
+def load_config(ep: Path, need_voice: bool = True) -> dict:
     path = ep / "vo.config.json"
     if not path.exists():
         sys.exit(f"{path} is missing. Create it and have David pick the engine first.")
@@ -48,7 +51,7 @@ def load_config(ep: Path) -> dict:
             "The engine is David's decision per episode -- ask him, record it, then re-run."
         )
     g = cfg.get("gemini") or {}
-    missing = [k for k in ("model", "voice") if not g.get(k)]
+    missing = [k for k in (("model", "voice") if need_voice else ("model",)) if not g.get(k)]
     if missing:
         sys.exit(f"vo.config.json gemini.{', gemini.'.join(missing)} not set yet.")
     return cfg
@@ -85,6 +88,16 @@ def api_key(env_file: str | None) -> str:
             if ln.strip().startswith("GEMINI_API_KEY="):
                 return ln.split("=", 1)[1].strip().strip("\"'")
     sys.exit("GEMINI_API_KEY not set (export it, or pass --env path/to/.env).")
+
+
+def list_models(key: str) -> None:
+    url = "https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000"
+    req = urllib.request.Request(url, headers={"x-goog-api-key": key})
+    with urllib.request.urlopen(req, timeout=60) as r:
+        models = json.load(r).get("models", [])
+    for m in models:
+        if "tts" in m["name"].lower():
+            print(m["name"].removeprefix("models/"), "-", m.get("displayName", ""))
 
 
 def synthesize(key: str, g: dict, text: str) -> tuple[bytes, int]:
@@ -138,11 +151,37 @@ def main() -> None:
     ap.add_argument("part", nargs="?", help="part id (s03) or 'all'")
     ap.add_argument("--list", action="store_true", help="list the parts and exit, no API calls")
     ap.add_argument("--env", help=".env file holding GEMINI_API_KEY")
+    ap.add_argument("--audition", metavar="PART", help="voice PART once per gemini.audition_voices")
+    ap.add_argument("--models", action="store_true", help="list TTS models available to this key")
     args = ap.parse_args()
 
     ep = args.episode
     raw = json.loads((ep / "vo.config.json").read_text(encoding="utf-8")) if (ep / "vo.config.json").exists() else {}
     items = parts(ep / "script.md", raw.get("skip_sections", []))
+
+    if args.models:
+        list_models(api_key(args.env))
+        return
+
+    if args.audition:
+        cfg = load_config(ep, need_voice=False)
+        g = cfg["gemini"]
+        voices = g.get("audition_voices") or []
+        if not voices:
+            sys.exit("vo.config.json gemini.audition_voices is empty.")
+        hit = [p for p in items if p[0] == args.audition]
+        if not hit:
+            sys.exit(f"No part {args.audition!r}. Use --list to see them.")
+        pid, name, text = hit[0]
+        key = api_key(args.env)
+        out = ep / "vo" / "audition"
+        out.mkdir(parents=True, exist_ok=True)
+        for v in voices:
+            print(f"{pid} as {v} ...", flush=True)
+            pcm, rate = synthesize(key, {**g, "voice": v}, text)
+            dur = write_wav(out / f"{pid}_{v}.wav", pcm, rate)
+            print(f"  -> vo/audition/{pid}_{v}.wav  {dur:.1f}s", flush=True)
+        return
 
     if args.list or not args.part:
         total = 0
