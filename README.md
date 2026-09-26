@@ -53,7 +53,8 @@ segment. The `.en` variants are English-only and faster.
 
 ```bash
 python3 tools/gemini_tts.py episodes/ep11-stockton --list
-GEMINI_API_KEY=... python3 tools/gemini_tts.py episodes/ep11-stockton all
+python3 tools/gemini_tts.py episodes/ep11-stockton all   # reads GEMINI_API_KEY
+python3 tools/eleven_sts.py episodes/ep11-stockton all   # converts to Maya's voice
 ```
 
 A take can be checked by transcribing it back with `tools/transcribe.py`.

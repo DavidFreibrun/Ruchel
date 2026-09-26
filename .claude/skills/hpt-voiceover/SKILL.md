@@ -43,33 +43,44 @@ David's ruling (2026-09-26, Ep 11): **Gemini performs, ElevenLabs converts it in
 
 ```bash
 EP=episodes/epNN-slug
-GM_ENV="<Gray Matters .env>"                                   # GEMINI_API_KEY
-HPT_ENV="G:/My Drive/.../heritage-pinoy-pipeline/.env"         # ElevenLabs key
+# GEMINI_API_KEY is an environment variable on David's PC; nothing to pass.
+# ELEVENLABS_API_KEY is read from heritage-pinoy-pipeline/.env automatically, as in Ep 7–10.
 
-python3 tools/gemini_tts.py $EP --list                            # parts and word counts, free
-python3 tools/gemini_tts.py $EP --models --env "$GM_ENV"          # confirm the model id exists
-python3 tools/gemini_tts.py $EP --audition s01 --env "$GM_ENV"    # one take per audition voice
+python3 tools/gemini_tts.py $EP --list             # parts and word counts, free
+python3 tools/gemini_tts.py $EP --models           # confirm the model id exists
+python3 tools/gemini_tts.py $EP --audition s01     # one take per audition voice
 #   David picks a voice by ear, then write it into gemini.voice
-python3 tools/gemini_tts.py $EP all --env "$GM_ENV"               # vo/sNN.wav
-python3 tools/eleven_sts.py $EP all --env "$HPT_ENV"              # vo/maya/sNN.mp3  <- these ship
+python3 tools/gemini_tts.py $EP all                # vo/sNN.wav   (Gemini delivery)
+python3 tools/eleven_sts.py $EP all                # vo/maya/sNN.wav  <- these ship
 ```
 
-- **Settings** come from `vo.config.json`: `gemini` holds `model`, `voice`, `audition_voices`, `style_prompt`, `language_code` and `temperature`; `sts` holds the voice ID, model and voice settings. The tools refuse to guess: `voice` stays `null` until David has picked one.
+- **Settings** come from `vo.config.json`: `gemini` holds `model`, `voice`, `audition_voices`, `style_prompt`, `language_code` and `temperature`; `sts` holds the conversion settings. The tools refuse to guess: `voice` stays `null` until David has picked one.
 - **Voice audition:** do it once per new setup, on the cold open. Judge each take on its delivery, since the timbre gets replaced later. If David wants to hear the takes as Maya, run each audition file through STS before he listens.
 - **Style prompt:** it is sent in front of the text, so it can leak into the audio. The transcript grep is mandatory. Run it on the **converted** file, because that is what ships.
 - **Model:** `gemini-3.8-flash-tts` was the newest model at setup (announced 2026-09-23). Confirm it with `--models` on the first run; if the ID differs, fix the config rather than the code.
-- **Levels:** Maya's STS output may sit at a different loudness from the Ep 8–10 TTS. Level-match in the mix, as was done for on-camera blocks.
-- **No word timestamps.** Neither Gemini nor STS returns word times. If an episode needs word-cued timing (the Ep 9 `vo_block_timing.py` method), that needs an alignment pass on `vo/maya/sNN.mp3`. That is still an open question.
+- **Timing is per section.** David ruled on 2026-09-26 that section-level timing is enough, so no word-level alignment. Each `[SECTION]` is one file, and the manifest records its length.
+
+### Speech-to-speech recipe (from Ep 7/8 `voice_swap.py`; don't change casually)
+
+- Model `eleven_multilingual_sts_v2` into voice `TcZDZdbOYm8HPLDiDkn0`. Send only the model and `remove_background_noise`, **never `voice_settings`**: invented voice settings caused the pitch artifact David rejected on 2026-08-13. `eleven_sts.py` refuses to run if `voice_settings` is set.
+- `remove_background_noise`: `false` for Gemini input, which is clean studio audio. Ep 7 used `true` on Veo audio.
+- **Level policy:** STS returns about 4 LU quieter than TTS (Ep 8 measurement). Match level with **gain only** to −18.4 LUFS, plus a −1.5 dBTP true-peak limiter. **Never compress.** STS keeps a real performance (LRA 5–9), and compression ate that warmth on Ep 8. `eleven_sts.py` does this and logs the before and after figures in `vo/maya/manifest.json`.
+- Keep audio mono end to end, with PCM intermediates. AAC is encoded **once**, at the final mux. Never downmix an intermediate with `-ac 2`: a stereo downmix phase-cancelled the Ep 7 mix.
+
+## On-camera blocks (Seedance), whichever engine
+
+- Seedance generates Maya speaking her line with its own native voice, and that voice drives the lip sync.
+- The native audio is then converted into Maya's voice with the Ep 8 `voice_swap.py` (same STS recipe and level policy as above). STS changes the timbre without changing the timing, so the lips stay in sync.
+- Never lay TTS over an on-camera clip: it won't stay in sync.
+- The engine choice only governs the voice-only narration. On-camera blocks always go through Seedance and then `voice_swap.py`.
 
 ## Open decisions (ask David; update this file when answered)
 
 - [ ] Which **voice** Maya uses in Gemini. Decided by the Ep 11 audition.
-- [ ] The **path of the Gray Matters `.env`** that holds `GEMINI_API_KEY`.
-- [ ] **On-camera blocks** in a Gemini episode: keep the Veo-native-audio → STS method, or use Gemini audio → STS?
-- [ ] **Word timing** for Gemini takes: forced alignment, or is section-level timing enough?
 
 ## Decision log
 
 | Date | Episode | Decision |
 | --- | --- | --- |
-| 2026-09-26 | 11 | Engine: **Gemini**. Voice: pick fresh by audition, not Walt's Gray Matters settings. Convert to Maya with ElevenLabs STS. Gemini key comes from the Gray Matters `.env`. |
+| 2026-09-26 | 11 | Engine: **Gemini**. Voice: pick fresh by audition, not Walt's Gray Matters settings. Convert to Maya with ElevenLabs STS. |
+| 2026-09-26 | all | `GEMINI_API_KEY` comes from David's PC environment variables. `ELEVENLABS_API_KEY` comes from the pipeline `.env`. On-camera blocks are Seedance, then STS to Maya. Timing per section is enough. |

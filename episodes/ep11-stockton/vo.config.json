@@ -3,11 +3,18 @@
   "engine": "gemini",
   "decided_by": "David",
   "decided_on": "2026-09-26",
-  "skip_sections": ["NEXT TIME"],
+  "skip_sections": [
+    "NEXT TIME"
+  ],
   "gemini": {
     "model": "gemini-3.8-flash-tts",
     "voice": null,
-    "audition_voices": ["Sulafat", "Kore", "Leda", "Aoede"],
+    "audition_voices": [
+      "Sulafat",
+      "Kore",
+      "Leda",
+      "Aoede"
+    ],
     "style_prompt": "Read this as Maya, a warm Filipino-American woman in her early forties telling her community's history to a friend. Conversational and unhurried, curious, with quiet feeling on the heavy lines and a smile on the lighter ones. Say Filipino words the Tagalog way:",
     "language_code": "en-US",
     "temperature": null
@@ -16,12 +23,16 @@
     "enabled": true,
     "voice_id": "TcZDZdbOYm8HPLDiDkn0",
     "model_id": "eleven_multilingual_sts_v2",
-    "voice_settings": {"stability": 0.30, "similarity_boost": 0.82, "style": 0.50, "use_speaker_boost": true},
     "remove_background_noise": false,
-    "output_format": "mp3_44100_192"
+    "output_format": "mp3_44100_128",
+    "target_lufs": -18.4,
+    "ceiling_dbtp": -1.5,
+    "_source": "Ep 7/8 voice_swap.py: model + noise flag only, NO voice_settings; gain-only level match"
   },
   "api_keys": {
-    "gemini": "Gray Matters .env (GEMINI_API_KEY), path TBD",
-    "elevenlabs": "heritage-pinoy-pipeline/.env"
-  }
+    "gemini": "GEMINI_API_KEY environment variable on David's PC",
+    "elevenlabs": "ELEVENLABS_API_KEY in heritage-pinoy-pipeline/.env (same as Ep 7-10)"
+  },
+  "timing": "per section (David, 2026-09-26); no word-level alignment",
+  "on_camera": "Seedance native audio -> Maya via the Ep 8 voice_swap.py (STS, gain-only level match)"
 }
