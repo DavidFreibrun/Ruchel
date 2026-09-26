@@ -31,7 +31,7 @@
   },
   "api_keys": {
     "gemini": "GEMINI_API_KEY environment variable on David's PC",
-    "elevenlabs": "ELEVENLABS_API_KEY in heritage-pinoy-pipeline/.env (same as Ep 7-10)"
+    "elevenlabs": "ELEVENLABS_API_KEY in the heritage-pinoy-pipeline .env on D: (set HPT_PIPELINE_ENV to it)"
   },
   "timing": "per section (David, 2026-09-26); no word-level alignment",
   "on_camera": "Seedance native audio -> Maya via the Ep 8 voice_swap.py (STS, gain-only level match)"

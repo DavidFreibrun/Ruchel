@@ -5,6 +5,8 @@ description: Generate Maya's narration VO for a Heritage Pinoy Talks (HPT) episo
 
 # HPT voiceover
 
+> **Paths: everything is on the D: drive.** G: (Google Drive for desktop) is retired. Old Ep 7–10 scripts on Drive still say `G:\My Drive\...`; never copy those paths. Translate them to D:, and ask David if you're not sure where something lives.
+
 ## Gate: which engine? (do this first, every episode)
 
 1. Open `episodes/epNN-*/vo.config.json`. If it doesn't exist, copy it from the latest episode and reset `engine`, `decided_by` and `decided_on` to `null`.
@@ -35,7 +37,7 @@ description: Generate Maya's narration VO for a Heritage Pinoy Talks (HPT) episo
 - Set `previous_text` / `next_text` to the real neighbouring spoken lines.
 - Use `/with-timestamps` so block timing comes from the take's own word times.
 - On-camera blocks: Veo native audio, then ElevenLabs speech-to-speech into the same voice ID. TTS and speech-to-speech run about 4 LU apart, so level-match per block.
-- The generators live in the Drive pipeline (`heritage-pinoy-pipeline`, e.g. Ep 9's `gen_sections_vo.py`).
+- The generators live in the `heritage-pinoy-pipeline` folder on D: (e.g. Ep 9's `gen_sections_vo.py`).
 
 ## Engine: Gemini TTS (then converted to Maya)
 
@@ -44,7 +46,7 @@ David's ruling (2026-09-26, Ep 11): **Gemini performs, ElevenLabs converts it in
 ```bash
 EP=episodes/epNN-slug
 # GEMINI_API_KEY is an environment variable on David's PC; nothing to pass.
-# ELEVENLABS_API_KEY is read from heritage-pinoy-pipeline/.env automatically, as in Ep 7–10.
+# ELEVENLABS_API_KEY is read from the pipeline .env on D:, named by the HPT_PIPELINE_ENV variable (or pass --env).
 
 python3 tools/gemini_tts.py $EP --list             # parts and word counts, free
 python3 tools/gemini_tts.py $EP --models           # confirm the model id exists
@@ -77,6 +79,7 @@ python3 tools/eleven_sts.py $EP all                # vo/maya/sNN.wav  <- these s
 ## Open decisions (ask David; update this file when answered)
 
 - [ ] Which **voice** Maya uses in Gemini. Decided by the Ep 11 audition.
+- [ ] The exact **D: paths** of the HPT root and `heritage-pinoy-pipeline\.env`.
 
 ## Decision log
 
@@ -84,3 +87,4 @@ python3 tools/eleven_sts.py $EP all                # vo/maya/sNN.wav  <- these s
 | --- | --- | --- |
 | 2026-09-26 | 11 | Engine: **Gemini**. Voice: pick fresh by audition, not Walt's Gray Matters settings. Convert to Maya with ElevenLabs STS. |
 | 2026-09-26 | all | `GEMINI_API_KEY` comes from David's PC environment variables. `ELEVENLABS_API_KEY` comes from the pipeline `.env`. On-camera blocks are Seedance, then STS to Maya. Timing per section is enough. |
+| 2026-09-26 | all | Everything lives on **D:**. G: is no longer used. |

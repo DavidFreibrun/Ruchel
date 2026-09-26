@@ -23,7 +23,7 @@ Carried over from the Ep 7/8 voice_swap.py, not to be changed casually:
   * Mono end to end, PCM intermediates. AAC is encoded once, at the final mux.
 
 The ElevenLabs key is ELEVENLABS_API_KEY, read from the environment, then --env, then the
-pipeline .env the old episodes used.
+pipeline .env named by HPT_PIPELINE_ENV (on D:, since the Sept 2026 move off G:).
 """
 
 import argparse
@@ -39,18 +39,21 @@ import uuid
 from pathlib import Path
 
 API = "https://api.elevenlabs.io/v1/speech-to-speech/{voice}?output_format={fmt}"
-PIPELINE_ENV = r"G:\My Drive\Freibrun Enterprises\Heritage Pinoy Talks\heritage-pinoy-pipeline\.env"
+# Everything moved from G: (Google Drive) to D: in Sept 2026. Point this at the pipeline .env
+# with the HPT_PIPELINE_ENV environment variable; nothing on G: is read any more.
+PIPELINE_ENV = os.environ.get("HPT_PIPELINE_ENV", "")
 
 
 def api_key(env_file: str | None, var: str) -> str:
     if os.environ.get(var):
         return os.environ[var]
-    env_file = env_file or (PIPELINE_ENV if os.path.exists(PIPELINE_ENV) else None)
+    env_file = env_file or (PIPELINE_ENV if PIPELINE_ENV and os.path.exists(PIPELINE_ENV) else None)
     if env_file:
         for ln in open(env_file, encoding="utf-8"):
             if ln.strip().startswith(var + "="):
                 return ln.split("=", 1)[1].strip().strip("\"'")
-    sys.exit(f"{var} not set (export it, or pass --env path/to/.env).")
+    sys.exit(f"{var} not set: export it, pass --env D:\\...\\heritage-pinoy-pipeline\\.env, "
+             "or set HPT_PIPELINE_ENV to that file.")
 
 
 def ffmpeg() -> str:
