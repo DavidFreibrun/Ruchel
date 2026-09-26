@@ -23,7 +23,8 @@ Carried over from the Ep 7/8 voice_swap.py, not to be changed casually:
   * Mono end to end, PCM intermediates. AAC is encoded once, at the final mux.
 
 The ElevenLabs key is ELEVENLABS_API_KEY, read from the environment, then --env, then the
-pipeline .env named by HPT_PIPELINE_ENV (on D:, since the Sept 2026 move off G:).
+pipeline .env at D:\Freibrun Enterprises\Heritage Pinoy Talks\heritage-pinoy-pipeline\.env
+(override with HPT_PIPELINE_ENV).
 """
 
 import argparse
@@ -39,9 +40,10 @@ import uuid
 from pathlib import Path
 
 API = "https://api.elevenlabs.io/v1/speech-to-speech/{voice}?output_format={fmt}"
-# Everything moved from G: (Google Drive) to D: in Sept 2026. Point this at the pipeline .env
-# with the HPT_PIPELINE_ENV environment variable; nothing on G: is read any more.
-PIPELINE_ENV = os.environ.get("HPT_PIPELINE_ENV", "")
+# Everything moved from G: (Google Drive) to D: in Sept 2026; nothing on G: is read any more.
+# HPT_PIPELINE_ENV overrides this if the pipeline ever moves again.
+HPT_ROOT = r"D:\Freibrun Enterprises\Heritage Pinoy Talks"
+PIPELINE_ENV = os.environ.get("HPT_PIPELINE_ENV", os.path.join(HPT_ROOT, "heritage-pinoy-pipeline", ".env"))
 
 
 def api_key(env_file: str | None, var: str) -> str:
